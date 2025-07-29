@@ -1,108 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>DIG Intelligent Tax System (Lab)</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-NaWTH08pQFy7sG6iwSeNQqzJ+z0YzUKGwEuITdSb9VInAqzQ8bVQz9YJ0w2bZZ2K1g9ZlZQzQ0jrISFRCGDpaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<style>
- body{font-family:'Inter',sans-serif;background:#f8fafc;color:#374151}
- .card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,.06)}
- .btn{padding:.5rem 1rem;border-radius:.5rem;font-weight:500;transition:background .15s;box-shadow:0 1px 2px rgba(0,0,0,.05)}
- .btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover{background:#2563eb}
- .btn-ghost{background:#f3f4f6}.btn-ghost:hover{background:#e5e7eb}
- .input{width:100%;padding:.5rem .75rem;border:1px solid #d1d5db;border-radius:.375rem}
- .input:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.3);outline:none}
- .label{font-size:.875rem;font-weight:500;color:#6b7280;margin:.25rem 0;display:block}
- table{width:100%;font-size:.875rem;border-collapse:collapse}
- th,td{border:1px solid #e5e7eb;padding:.35rem .5rem;text-align:left}
- th{background:#f9fafb;font-weight:600}
- .hidden{display:none}
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIG Intelligent Tax System (Lab)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-NaWTH08pQFy7sG6iwSeNQqzJ+z0YzUKGwEuITdSb9VInAqzQ8bVQz9YJ0w2bZZ2K1g9ZlZQzQ0jrISFRCGDpaA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    :root{
+      --primary:#6366f1; /* indigo-500 */
+      --primary-dark:#4f46e5;
+      --accent:#14b8a6;  /* teal-500 */
+      --bg:#f8fafc;
+    }
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:#374151}
+    .card{background:#fff;border-radius:1rem;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+    .btn{padding:.55rem 1rem;border-radius:.6rem;font-weight:500;transition:all .15s;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-ghost{background:#f3f4f6}
+    .btn-ghost:hover{background:#e5e7eb}
+    .input{width:100%;padding:.55rem .75rem;border:1px solid #d1d5db;border-radius:.45rem}
+    .input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(99,102,241,.25);outline:none}
+    .label{font-size:.85rem;font-weight:500;color:#6b7280;margin:.25rem 0;display:block}
+    table{width:100%;font-size:.85rem;border-collapse:collapse}
+    th,td{border:1px solid #e5e7eb;padding:.35rem .5rem;text-align:left}
+    th{background:#f9fafb;font-weight:600}
+    .hidden{display:none}
+    .gradient-header{background:linear-gradient(90deg,#6366f1,#14b8a6);}
+    .step-active{background:#e0e7ff;font-weight:600}
+    .toast{position:fixed;right:1rem;bottom:1rem;background:#111827;color:#fff;padding:.75rem 1rem;border-radius:.5rem;opacity:0;transform:translateY(20px);transition:all .3s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .progress-bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+    .progress-bar > div{height:100%;background:var(--primary);transition:width .2s}
+  </style>
 </head>
-<body>
-<div id="app" class="min-h-screen flex flex-col">
-<header class="p-4 flex justify-between items-center">
-  <h1 class="text-xl font-bold">DIG Intelligent Tax System <span class="text-gray-400 text-sm">(Lab)</span></h1>
-  <div class="flex items-center gap-3 text-sm text-gray-500">
-    <span id="yearIndicator"></span>
-    <button id="profileBtn" class="btn btn-ghost">Profiles</button>
-    <div id="userIndicator"></div>
-  </div>
-</header>
-
-<main class="flex-1 flex flex-col items-center p-6">
-  <section id="welcomeView" class="card w-full max-w-xl p-8 text-center space-y-6">
-    <h2 class="text-2xl font-semibold">Welcome!</h2>
-    <p id="dailyQuote" class="italic text-gray-600"></p>
-    <div class="flex gap-4 justify-center">
-      <button id="loginBtn" class="btn btn-primary">Simulated Login</button>
-      <button id="guestBtn" class="btn btn-ghost">Continue as Guest</button>
+<body class="h-full">
+<div id="toast" class="toast"></div>
+<div id="app" class="min-h-full flex flex-col">
+  <header class="gradient-header p-4 text-white flex justify-between items-center shadow">
+    <h1 class="text-xl font-semibold">DIG Intelligent Tax System <span class="opacity-80 text-sm">(Lab)</span></h1>
+    <div class="flex items-center gap-4 text-sm">
+      <span id="yearIndicator" class="opacity-90"></span>
+      <button id="profileBtn" class="btn btn-ghost bg-white/10 text-white hover:bg-white/20">Profiles</button>
+      <div id="userIndicator" class="opacity-90"></div>
     </div>
-  </section>
+  </header>
 
-  <section id="loginModal" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center">
-    <div class="card p-6 w-full max-w-sm space-y-4">
-      <h3 class="text-lg font-semibold">Simulated Login</h3>
-      <label class="label" for="username">Name</label>
-      <input id="username" class="input" placeholder="Enter any name"/>
-      <div class="flex justify-end gap-3 pt-2">
-        <button id="cancelLogin" class="btn btn-ghost">Cancel</button>
-        <button id="confirmLogin" class="btn btn-primary">Login</button>
+  <div class="progress-bar mx-auto w-full max-w-5xl mt-2"><div id="progressFill" style="width:0%"></div></div>
+
+  <main class="flex-1 flex flex-col items-center p-6 pb-20">
+    <!-- Welcome -->
+    <section id="welcomeView" class="card w-full max-w-xl p-8 text-center space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-800">Welcome!</h2>
+      <p id="dailyQuote" class="italic text-gray-600"></p>
+      <div class="flex gap-4 justify-center">
+        <button id="loginBtn" class="btn btn-primary">Simulated Login</button>
+        <button id="guestBtn" class="btn btn-ghost">Continue as Guest</button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="profilesModal" class="fixed inset-0 bg-black bg-opacity-40 hidden justify-center items-center">
-    <div class="card p-6 w-full max-w-lg space-y-4">
-      <h3 class="text-lg font-semibold">Profiles</h3>
-      <div id="profilesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
-      <div class="flex gap-2">
-        <input id="newProfileName" class="input" placeholder="New profile name"/>
-        <button id="addProfile" class="btn btn-primary">Add</button>
-      </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button id="closeProfiles" class="btn btn-ghost">Close</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="dashboardView" class="w-full max-w-5xl hidden">
-    <div class="grid md:grid-cols-4 gap-4">
-      <aside class="md:col-span-1 card p-4 space-y-2">
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Steps</h3>
-        <nav id="stepNav" class="flex md:flex-col gap-2 text-sm"></nav>
-
-        <div class="mt-6 space-y-2">
-          <h4 class="text-xs font-semibold text-gray-500 uppercase">Utilities</h4>
-          <button id="exportJson" class="btn btn-ghost w-full text-left">Export JSON</button>
-          <label class="btn btn-ghost w-full text-left cursor-pointer">
-            Import JSON
-            <input id="importJson" type="file" accept="application/json" class="hidden">
-          </label>
-          <label class="label mt-3">Tax Year</label>
-          <select id="taxYear" class="input">
-            <option value="2025">2025</option>
-            <option value="2024" selected>2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-          </select>
-        </div>
-      </aside>
-      <div class="md:col-span-3 card p-6 space-y-6">
-        <div id="stepContainer"></div>
-        <div class="flex justify-between">
-          <button id="prevStep" class="btn btn-ghost">&larr; Back</button>
-          <button id="nextStep" class="btn btn-primary">Next &rarr;</button>
+    <!-- Login Modal -->
+    <section id="loginModal" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50">
+      <div class="card p-6 w-full max-w-sm space-y-4">
+        <h3 class="text-lg font-semibold">Simulated Login</h3>
+        <label class="label" for="username">Name</label>
+        <input id="username" class="input" placeholder="Enter any name"/>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="cancelLogin" class="btn btn-ghost">Cancel</button>
+          <button id="confirmLogin" class="btn btn-primary">Login</button>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
 
-<footer class="p-4 text-center text-xs text-gray-400">&copy; 2025 DIG Intelligent Tax System (Lab) — Simulation only.</footer>
+    <!-- Profiles Modal -->
+    <section id="profilesModal" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50">
+      <div class="card p-6 w-full max-w-lg space-y-4">
+        <h3 class="text-lg font-semibold">Profiles</h3>
+        <div id="profilesList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        <div class="flex gap-2">
+          <input id="newProfileName" class="input" placeholder="New profile name"/>
+          <button id="addProfile" class="btn btn-primary">Add</button>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="closeProfiles" class="btn btn-ghost">Close</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboardView" class="w-full max-w-6xl hidden">
+      <div class="grid md:grid-cols-4 gap-4">
+        <aside class="md:col-span-1 card p-4 space-y-2">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Steps</h3>
+          <nav id="stepNav" class="flex md:flex-col gap-2 text-sm"></nav>
+
+          <div class="mt-6 space-y-2">
+            <h4 class="text-xs font-semibold text-gray-500 uppercase">Utilities</h4>
+            <button id="exportJson" class="btn btn-ghost w-full text-left">Export JSON</button>
+            <label class="btn btn-ghost w-full text-left cursor-pointer">
+              Import JSON
+              <input id="importJson" type="file" accept="application/json" class="hidden">
+            </label>
+            <label class="label mt-3">Tax Year</label>
+            <select id="taxYear" class="input">
+              <option value="2025">2025</option>
+              <option value="2024" selected>2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+        </aside>
+
+        <div class="md:col-span-3 card p-6 space-y-6">
+          <div id="stepContainer"></div>
+          <div class="flex justify-between">
+            <button id="prevStep" class="btn btn-ghost">&larr; Back</button>
+            <button id="nextStep" class="btn btn-primary">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="p-4 text-center text-xs text-gray-400">&copy; 2025 DIG Intelligent Tax System (Lab) — Simulation only. No fees, ever.</footer>
 </div>
 
 <script type="module" src="js/app.js"></script>
